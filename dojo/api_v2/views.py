@@ -374,7 +374,7 @@ class EngagementViewSet(prefetch.PrefetchListMixin,
                 "author": author, "entry": entry,
                 "private": private
             })
-            result = serializers.EngagementToNotesSerializer({
+            serializers.EngagementToNotesSerializer({
                 "engagement_id": engagement, "notes": [serialized_note.data]
             })
             return Response(serialized_note.data,
