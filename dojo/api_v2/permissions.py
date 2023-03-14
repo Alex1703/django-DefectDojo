@@ -40,8 +40,8 @@ def check_post_permission(request, post_model, post_pk, post_permission):
                     post_pk
                 )
             )
-        object = get_object_or_404(post_model, pk=request.data.get(post_pk))
-        return user_has_permission(request.user, object, post_permission)
+        tmp_object = get_object_or_404(post_model, pk=request.data.get(post_pk))
+        return user_has_permission(request.user, tmp_object, post_permission)
     else:
         return True
 
@@ -152,21 +152,21 @@ class UserHasDojoMetaPermission(permissions.BasePermission):
             has_permission_result = True
             product_id = request.data.get("product", None)
             if product_id:
-                object = get_object_or_404(Product, pk=product_id)
+                tmp_object = get_object_or_404(Product, pk=product_id)
                 has_permission_result = has_permission_result and user_has_permission(
-                    request.user, object, Permissions.Product_Edit
+                    request.user, tmp_object, Permissions.Product_Edit
                 )
             finding_id = request.data.get("finding", None)
             if finding_id:
-                object = get_object_or_404(Finding, pk=finding_id)
+                tmp_object = get_object_or_404(Finding, pk=finding_id)
                 has_permission_result = has_permission_result and user_has_permission(
-                    request.user, object, Permissions.Finding_Edit
+                    request.user, tmp_object, Permissions.Finding_Edit
                 )
             endpoint_id = request.data.get("endpoint", None)
             if endpoint_id:
-                object = get_object_or_404(Endpoint, pk=endpoint_id)
+                tmp_object = get_object_or_404(Endpoint, pk=endpoint_id)
                 has_permission_result = has_permission_result and user_has_permission(
-                    request.user, object, Permissions.Endpoint_Edit
+                    request.user, tmp_object, Permissions.Endpoint_Edit
                 )
             return has_permission_result
         else:
@@ -422,7 +422,7 @@ class UserHasImportPermission(permissions.BasePermission):
                 "Need engagement_id or product_name + engagement_name to perform import",
             )
         else:
-            # the engagement doesn't exist, so we need to check if the user has requested and is allowed to use auto_create
+        #the engagement doesn't exist,so we need to check if the user has requested and is allowed to use auto_create
             return check_auto_create_permission(
                 request.user,
                 product,
@@ -715,15 +715,15 @@ class UserHasJiraProductPermission(permissions.BasePermission):
             has_permission_result = True
             engagement_id = request.data.get("engagement", None)
             if engagement_id:
-                object = get_object_or_404(Engagement, pk=engagement_id)
+                tmp_object = get_object_or_404(Engagement, pk=engagement_id)
                 has_permission_result = has_permission_result and user_has_permission(
-                    request.user, object, Permissions.Engagement_Edit
+                    request.user, tmp_object, Permissions.Engagement_Edit
                 )
             product_id = request.data.get("product", None)
             if product_id:
-                object = get_object_or_404(Product, pk=product_id)
+                tmp_object = get_object_or_404(Product, pk=product_id)
                 has_permission_result = has_permission_result and user_has_permission(
-                    request.user, object, Permissions.Product_Edit
+                    request.user, tmp_object, Permissions.Product_Edit
                 )
             return has_permission_result
         else:
@@ -758,21 +758,21 @@ class UserHasJiraIssuePermission(permissions.BasePermission):
             has_permission_result = True
             engagement_id = request.data.get("engagement", None)
             if engagement_id:
-                object = get_object_or_404(Engagement, pk=engagement_id)
+                tmp_object = get_object_or_404(Engagement, pk=engagement_id)
                 has_permission_result = has_permission_result and user_has_permission(
-                    request.user, object, Permissions.Engagement_Edit
+                    request.user, tmp_object, Permissions.Engagement_Edit
                 )
             finding_id = request.data.get("finding", None)
             if finding_id:
-                object = get_object_or_404(Finding, pk=finding_id)
+                tmp_object = get_object_or_404(Finding, pk=finding_id)
                 has_permission_result = has_permission_result and user_has_permission(
-                    request.user, object, Permissions.Finding_Edit
+                    request.user, tmp_object, Permissions.Finding_Edit
                 )
             finding_group_id = request.data.get("finding_group", None)
             if finding_group_id:
-                object = get_object_or_404(Finding_Group, pk=finding_group_id)
+                tmp_object = get_object_or_404(Finding_Group, pk=finding_group_id)
                 has_permission_result = has_permission_result and user_has_permission(
-                    request.user, object, Permissions.Finding_Group_Edit
+                    request.user, tmp_object, Permissions.Finding_Group_Edit
                 )
             return has_permission_result
         else:
@@ -898,21 +898,23 @@ def check_auto_create_permission(
     product_type_name,
     error_message,
 ):
-    """
-    For an existing engagement, to be allowed to import a scan, the following must all be True:
-    - User must have Import_Scan_Result permission for this Engagement
+    #For an existing engagement, to be allowed to import a scan, the following must all be True:
+    # - User must have Import_Scan_Result permission for this Engagement
 
-    For an existing product, to be allowed to import into a new engagement with name `engagement_name`, the following must all be True:
-    - Product with name `product_name`  must already exist;
-    - User must have Engagement_Add permission for this Product
-    - User must have Import_Scan_Result permission for this Product
+    #For an existing product, to be allowed to import into a new engagement with name `engagement_name`,
+    # the following must all be True:
+    # - Product with name `product_name`  must already exist;
+    # - User must have Engagement_Add permission for this Product
+    # - User must have Import_Scan_Result permission for this Product
 
-    If the product doesn't exist yet, to be allowed to import into a new product with name `product_name` and prod_type `product_type_name`,
-    the following must all be True:
-    - `auto_create_context` must be True
-    - Product_Type already exists, or the user has the Product_Type_Add permission
-    - User must have Product_Type_Add_Product permission for the Product_Type, or the user has the Product_Type_Add permission
-    """
+    #If the product doesn't exist yet, 
+    # to be allowed to import into a new product with name `product_name` and prod_type `product_type_name`,
+    # the following must all be True:
+    # - `auto_create_context` must be True
+    # - Product_Type already exists, or the user has the Product_Type_Add permission
+    # - User must have Product_Type_Add_Product permission for the Product_Type, 
+    # or the user has the Product_Type_Add permission
+    
     if not product_name:
         raise ValidationError("product_name parameter missing")
 
@@ -967,15 +969,15 @@ def check_auto_create_permission(
 
 
 class UserHasConfigurationPermissionStaff(permissions.DjangoModelPermissions):
-
+    map_change_staff = "%(app_label)s.change_%(model_name)s"
     # Override map to also provide 'view' permissions
     perms_map = {
         "GET": ["%(app_label)s.view_%(model_name)s"],
         "OPTIONS": [],
         "HEAD": [],
         "POST": ["%(app_label)s.add_%(model_name)s"],
-        "PUT": ["%(app_label)s.change_%(model_name)s"],
-        "PATCH": ["%(app_label)s.change_%(model_name)s"],
+        "PUT": [map_change],
+        "PATCH": [map_change],
         "DELETE": ["%(app_label)s.delete_%(model_name)s"],
     }
 
@@ -984,15 +986,15 @@ class UserHasConfigurationPermissionStaff(permissions.DjangoModelPermissions):
 
 
 class UserHasConfigurationPermissionSuperuser(permissions.DjangoModelPermissions):
-
+    map_change_Superuser = "%(app_label)s.change_%(model_name)s"
     # Override map to also provide 'view' permissions
     perms_map = {
         "GET": ["%(app_label)s.view_%(model_name)s"],
         "OPTIONS": [],
         "HEAD": [],
         "POST": ["%(app_label)s.add_%(model_name)s"],
-        "PUT": ["%(app_label)s.change_%(model_name)s"],
-        "PATCH": ["%(app_label)s.change_%(model_name)s"],
+        "PUT": [map_change_Superuser],
+        "PATCH": [map_change_Superuser],
         "DELETE": ["%(app_label)s.delete_%(model_name)s"],
     }
 

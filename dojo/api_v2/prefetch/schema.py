@@ -6,13 +6,13 @@ from ..schema.utils import LazySchemaRef
 
 
 def get_prefetch_schema(methods, serializer):
-    """ Swagger / OpenAPI v2 (drf-yasg) Return a composable swagger schema that contains in the query the fields that can be prefetch from the model
-        supported by the serializer and in the reponse the structure of these fields in a new top-level attribute
-        named prefetch.
+    # Swagger / OpenAPI v2 (drf-yasg) Return a composable swagger schema that contains in the query the fields that can be prefetch from the model
+    # supported by the serializer and in the reponse the structure of these fields in a new top-level attribute
+    # named prefetch.
 
-        Returns:
-            ComposableSchema: A swagger schema
-    """
+    # Returns:
+    # ComposableSchema: A swagger schema
+    
     prefetcher = _Prefetcher()
     fields = _get_prefetchable_fields(serializer())
 
@@ -46,13 +46,13 @@ def _get_path_to_GET_serializer_map(generator):
 
 
 def prefetch_postprocessing_hook(result, generator, request, public):
-    """ OpenAPI v3 (drf-spectacular) Some endpoints are using the PrefetchListMixin and PrefetchRetrieveMixin.
-    These have nothing to do with Django prefetch_related.
-    The endpoints have an @extend_schema configured with an extra parameter 'prefetch'
-    This parameter contains an array of relations to prefetch. These prefetched models
-    will be returned in an additional property in the response.
-    The below processor ensures the result schema matches this.
-    """
+    # OpenAPI v3 (drf-spectacular) Some endpoints are using the PrefetchListMixin and PrefetchRetrieveMixin.
+    # These have nothing to do with Django prefetch_related.
+    # The endpoints have an @extend_schema configured with an extra parameter 'prefetch'
+    # This parameter contains an array of relations to prefetch. These prefetched models
+    # will be returned in an additional property in the response.
+    # The below processor ensures the result schema matches this.
+    
 
     serializer_classes = _get_path_to_GET_serializer_map(generator)
 
